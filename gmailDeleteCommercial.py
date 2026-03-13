@@ -27,17 +27,47 @@ try:
             msg = email.message_from_bytes(msg_data[0][1])  
   
             # Si el mensaje es multipart, obtener el contenido HTML  
+            # Obtener el contenido HTML  
+            html_content = ''  # Inicializa html_content como vacío  
+              
             if msg.is_multipart():  
+                found_html = False  # Bandera para verificar si se encontró contenido HTML  
                 for part in msg.walk():  
                     if part.get_content_type() == 'text/html':  
-                        html_content = part.get_payload(decode=True).decode()  
-                        break  
+                        found_html = True  # Se encontró contenido HTML  
+                        payload = part.get_payload(decode=True)  
+                        if payload is not None:  # Verificar que payload no sea None  
+                            try:  
+                                html_content = payload.decode('utf-8')  
+                            except UnicodeDecodeError:  
+                                try:  
+                                    html_content = payload.decode('iso-8859-1')  
+                                except UnicodeDecodeError:  
+                                    html_content = ''  # Asignar vacío si no se puede decodificar  
+                        break  # Salir del bucle una vez que se encontró el contenido HTML  
+                if not found_html:  
+                    print("No se encontró contenido HTML en el mensaje.")  
             else:  
-                html_content = msg.get_payload(decode=True).decode()  
-  
-            # Analizar el contenido HTML  
-            soup = BeautifulSoup(html_content, 'html.parser')  
-            body_text = soup.get_text()  
+                payload = msg.get_payload(decode=True)  
+                if payload is not None:  # Verificar que payload no sea None  
+                    try:  
+                        html_content = payload.decode('utf-8')  
+                    except UnicodeDecodeError:  
+                        try:  
+                            html_content = payload.decode('iso-8859-1')  
+                        except UnicodeDecodeError:  
+                            html_content = ''  # Asignar vacío si no se puede decodificar  
+                else:  
+                    print("El mensaje no tiene contenido.")  
+              
+            # En este punto, html_content debe estar definido.  
+            # Puedes proceder a analizarlo con BeautifulSoup si no está vacío.  
+            if html_content:  
+                soup = BeautifulSoup(html_content, 'html.parser')  
+                body_text = soup.get_text()  
+                # Resto de tu código para procesar el texto...  
+            else:  
+                print("No hay contenido HTML para analizar.")  
   
             # Verificar si la palabra "unsubscribe" está en el contenido  
             if (  
