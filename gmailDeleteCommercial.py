@@ -40,7 +40,12 @@ try:
             body_text = soup.get_text()  
   
             # Verificar si la palabra "unsubscribe" está en el contenido  
-            if 'unsubscribe' in body_text.lower():  
+            if (  
+                'unsubscribe' in body_text.lower() or  
+                'darse de baja' in body_text.lower() or  
+                'cancelar tu suscripción' in body_text.lower() or  
+                'cancel subscription' in body_text.lower()  
+            ):  
                 # Mover el mensaje a la papelera (Trash)  
                 mail.copy(email_id, 'Trash')  # Copiar el correo a la papelera  
                 mail.store(email_id, '+FLAGS', '\\Deleted')  # Marcar el correo como eliminado en la bandeja de entrada  
