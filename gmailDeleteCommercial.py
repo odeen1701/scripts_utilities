@@ -43,6 +43,7 @@ try:
             if (  
                 'unsubscribe' in body_text.lower() or  
                 'darse de baja' in body_text.lower() or  
+                'dejar de recibir' in body_text.lower() or
                 'cancelar tu suscripción' in body_text.lower() or  
                 'cancel subscription' in body_text.lower()  
             ):  
