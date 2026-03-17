@@ -14,6 +14,7 @@ patrones = [
         r'dándote de baja',
         r'dejar de recibir',
         r'cancelar tu suscripción',
+        r'cancelar su suscripción',
         r'cancela tu suscripción',
         r'cancel subscription',
         r'si no quiere recibir más comunicaciones'
