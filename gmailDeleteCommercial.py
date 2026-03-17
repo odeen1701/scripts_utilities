@@ -1,10 +1,23 @@
-import imaplib  
+import imaplib 
+import re 
 import email  
 from bs4 import BeautifulSoup  
 from cred import USERNAME, PASSWORD  #import credentials from cred.py file  
   
 # Conectar al servidor IMAP de Gmail  
 mail = imaplib.IMAP4_SSL('imap.gmail.com')  
+
+patrones = [
+        r'unsubscribe',
+        r'darse de baja',
+        r'darte de baja',
+        r'dándote de baja',
+        r'dejar de recibir',
+        r'cancelar tu suscripción',
+        r'cancela tu suscripción',
+        r'cancel subscription',
+        r'si no quiere recibir más comunicaciones'
+    ]
   
 try:  
     # Iniciar sesión  
@@ -20,6 +33,8 @@ try:
         # Obtener la lista de IDs de los mensajes  
         email_ids = messages[0].split()  
         print(f"total mensajes {len(email_ids)}")
+
+        email_ids.reverse()
   
         for email_id in email_ids:  
             # Fetch the email by ID  
@@ -70,13 +85,8 @@ try:
                 print("No hay contenido HTML para analizar.")  
   
             # Verificar si la palabra "unsubscribe" está en el contenido  
-            if (  
-                'unsubscribe' in body_text.lower() or  
-                'darse de baja' in body_text.lower() or  
-                'dejar de recibir' in body_text.lower() or
-                'cancelar tu suscripción' in body_text.lower() or  
-                'cancel subscription' in body_text.lower()  
-            ):  
+            regex_unificado = re.compile('|'.join(patrones), re.IGNORECASE)
+            if (bool(regex_unificado.search(body_text))):  
                 # Mover el mensaje a la papelera (Trash)  
                 mail.copy(email_id, 'Trash')  # Copiar el correo a la papelera  
                 mail.store(email_id, '+FLAGS', '\\Deleted')  # Marcar el correo como eliminado en la bandeja de entrada  
