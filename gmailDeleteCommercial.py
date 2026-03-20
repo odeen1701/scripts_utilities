@@ -6,7 +6,6 @@ from cred import USERNAME, PASSWORD  #import credentials from cred.py file
 
 # Conectar al servidor IMAP de Gmail
 mail = imaplib.IMAP4_SSL('imap.gmail.com')
-
 patrones = [
         r'unsubscribe',
         r'darse de baja',
@@ -23,11 +22,13 @@ patrones = [
         r'cancel subscription',
         r'cancelar suscripción',
         r'si no quiere recibir más comunicaciones',
+        r'if you do not want to receive these emails',
+        r'si no desea seguir recibiendo comunicaciones',
         r'si no deseas recibir estos correos electrónicos',
         r'se désinscrire',
         r'si no quiere recibir más comunicaciones comerciales',
-        r'manage your email preferences',
-    ]
+        r'manage your email preferences'
+]
 
 try:
     # Iniciar sesión
