@@ -6,6 +6,7 @@ from cred import USERNAME, PASSWORD  #import credentials from cred.py file
 
 # Conectar al servidor IMAP de Gmail
 mail = imaplib.IMAP4_SSL('imap.gmail.com')
+#mail = imaplib.IMAP4_SSL('imap.mail.me.com') 
 patrones = [
         r'darte de baja',
         r'darme de baja',
@@ -58,6 +59,7 @@ try:
 
     # Seleccionar la bandeja de entrada
     mail.select('inbox')
+    #mail.select('INBOX') #para icloud.
 
     # Buscar todos los correos en la bandeja de entrada
     status, messages = mail.search(None, 'ALL')
