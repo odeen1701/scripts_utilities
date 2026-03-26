@@ -126,9 +126,8 @@ patrones = [
         r'recibir menos correos',
         r'ajustar mis preferencias'
 ]
+
 try:
-
-
     search_criteria = build_search_criteria()
 
     # Iniciar sesión
