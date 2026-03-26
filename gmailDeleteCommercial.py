@@ -119,6 +119,7 @@ patrones = [
         r'remover de la lista',
         r'si quieres dejar de recibir',
         r'si no quieres recibir más comunicaciones',
+        r'si no quiere recibir más comunicaciones',
         r'si prefieres no recibir',
         r'modificar la suscripción',
         r'cambiar mis preferencias',
@@ -126,8 +127,9 @@ patrones = [
         r'recibir menos correos',
         r'ajustar mis preferencias'
 ]
-
 try:
+
+
     search_criteria = build_search_criteria()
 
     # Iniciar sesión
@@ -149,14 +151,9 @@ try:
         for email_id in email_ids:
             # Fetch the email by ID
             status, flag_data = mail.fetch(email_id, '(FLAGS)')
+            previousFlags = flag_data[0].decode() if flag_data[0] else ''
 
-            flags = flag_data[0].decode() if flag_data[0] else ''
-            #Skip already-read emails
-            if '\\Seen' in flags:
-                print(f'{email_id} ya fue leído, omitiendo')
-                continue
-
-            # Only NOW fetch the full email (it was unread)
+            # Only NOW fetch the full email
             status, msg_data = mail.fetch(email_id, '(RFC822)')
             msg = email.message_from_bytes(msg_data[0][1])
 
@@ -208,14 +205,14 @@ try:
             if (bool(regex_unificado.search(body_text))):
                 # Mover el mensaje a la papelera (Trash)
                 mail.copy(email_id, 'Trash')  # Copiar el correo a la papelera
-                mail.store(email_id, '+FLAGS', '\\Deleted')  # Marcar el correo como eliminado en la bandeja de entrada
+                mail.store(email_id, '+FLAGS', '\\Deleted')  # Marcar el correo como eliminado en la bandeja de entrada 
                 print(f'Correo ID {email_id.decode()} movido a la papelera.')
             else:
                 # Only mark as unread if the email was already read
                 status, flag_data = mail.fetch(email_id, '(FLAGS)')
                 flags = flag_data[0].decode() if flag_data[0] else ''
 
-                if '\\Seen' in flags:
+                if '\\Seen' in flags and '\\Seen' not in previousFlags:
                     mail.store(email_id, '-FLAGS', '\\Seen')  # Mark as unread
                     print(f'{email_id} marcado como no leído')
                 else:
