@@ -1,38 +1,57 @@
 import imaplib
-import email
-from cred import USERNAME,PASSWORD #need to define the credentias in a creed.py file.
+import sys
+from cred import USERNAME, PASSWORD, PROVIDER
 
-# Conectar al servidor IMAP de Gmail
-mail = imaplib.IMAP4_SSL('imap.gmail.com')
+
+# ─────────────────────────────────────────────
+# Configuración
+# ─────────────────────────────────────────────
+
+IMAP_SERVERS = {
+    'gmail':  'imap.gmail.com',
+    'icloud': 'imap.mail.me.com',
+}
+
+if PROVIDER not in IMAP_SERVERS:
+    print(f"PROVIDER '{PROVIDER}' no reconocido. Usa 'gmail' o 'icloud' en cred.py")
+    sys.exit(1)
+
+IMAP_SERVER = IMAP_SERVERS[PROVIDER]
+
+
+# ─────────────────────────────────────────────
+# Main
+# ─────────────────────────────────────────────
+
+mail = imaplib.IMAP4_SSL(IMAP_SERVER)
 
 try:
-    # Iniciar sesión
     mail.login(USERNAME, PASSWORD)
-
-    # Seleccionar la bandeja de entrada
     mail.select('inbox')
 
-    # Buscar todos los correos no leídos
     status, messages = mail.search(None, 'UNSEEN')
 
-    if status == 'OK':
-        # Obtener la lista de IDs de los mensajes no leídos
-        email_ids = messages[0].split()
-        print(f"numero de mensajes sin leer {len(email_ids)}")
-
-        # Marcar cada mensaje como leído
-        for email_id in email_ids:
-            mail.store(email_id, '+FLAGS', '\\Seen')
-            print(f"email {email_id} marcado como leido")
-
-        print(f'Se han marcado como leídos {len(email_ids)} mensajes.')
-
-    else:
+    if status != 'OK':
         print('No se pudieron buscar los mensajes.')
+        sys.exit(1)
+
+    email_ids = messages[0].split()
+    total = len(email_ids)
+    print(f"Mensajes sin leer: {total}")
+
+    if total == 0:
+        print("No hay mensajes sin leer.")
+        sys.exit(0)
+
+    # ✅ Marcar todos en un solo comando batch (1 llamada en lugar de N)
+    batch_str = ','.join(id.decode() for id in email_ids)
+    mail.store(batch_str, '+FLAGS', '\\Seen')
+
+    print(f"✅ {total} mensajes marcados como leídos.")
 
 except Exception as e:
-    print(f'Error: {e}')
+    import traceback
+    traceback.print_exc()
 
 finally:
-    # Cerrar la conexión
     mail.logout()
