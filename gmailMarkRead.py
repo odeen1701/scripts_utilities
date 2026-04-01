@@ -1,23 +1,39 @@
 import imaplib
 import sys
-from cred import USERNAME, PASSWORD, PROVIDER
+import cred
 
 
 # ─────────────────────────────────────────────
 # Configuración
 # ─────────────────────────────────────────────
+USERNAME = ""
+PASSWORD = ""
 
-IMAP_SERVERS = {
-    'gmail':  'imap.gmail.com',
-    'icloud': 'imap.mail.me.com',
+parser = argparse.ArgumentParser()
+parser.add_argument("provider", choices=["gmail", "icloud"])
+args = parser.parse_args()
+PROVIDER = args.provider
+
+
+if PROVIDER == 'gmail':
+    USERNAME = cred.USERNAME_GMAIL
+    PASSWORD = cred.PASSWORD_GMAIL
+elif PROVIDER == 'icloud':
+    USERNAME = cred.USERNAME_ICLOUD
+    PASSWORD = cred.PASSWORD_ICLOUD
+else:
+    raise ValueError(f"Provider not supported: {cred.PROVIDER}")
+
+IMAP_SERVERS  = {
+    'gmail': 'imap.gmail.com',
+    'icloud': 'imap.mail.me.com'
 }
 
 if PROVIDER not in IMAP_SERVERS:
-    print(f"PROVIDER '{PROVIDER}' no reconocido. Usa 'gmail' o 'icloud' en cred.py")
+    print(f"PROVIDER '{creed.PROVIDER}' no reconocido. Usa 'gmail' o 'icloud' en cred.py")
     sys.exit(1)
 
-IMAP_SERVER = IMAP_SERVERS[PROVIDER]
-
+IMAP_SERVER  = IMAP_SERVERS[PROVIDER]
 
 # ─────────────────────────────────────────────
 # Main
